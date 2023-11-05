@@ -1,0 +1,76 @@
+# https://taskfile.dev
+
+version: '3'
+output: 'prefixed'
+
+tasks:
+  init:
+    desc: "Initiate the environment. Run on first use or when dependencies change."
+    cmds:
+      - task: asdf:install-plugins
+      - task: install-tools
+      - mix local.hex --force
+      - mix local.rebar --force
+      - task: install-deps
+
+  asdf:install-plugins:
+    desc: "Install the asdf plugins."
+    cmds:
+      - task: asdf:install-plugin
+        vars: { PLUGIN: "elixir" }
+      - task: asdf:install-plugin
+        vars: { PLUGIN: "erlang" }
+
+  asdf:install-plugin:
+    desc: "Install an asdf plugin."
+    cmds:
+      - asdf plugin add {{.PLUGIN}}
+    status:
+      # Need to do the status check since asdf plugin install errors out if already installed and there is no way to suppress the error
+      - asdf plugin list | grep {{.PLUGIN}}
+
+  install-tools:
+    desc: "Install the required tooling with the correct versions such as elixir, npm, etc."
+    cmds:
+      - asdf install
+
+  install-deps:
+    desc: "Install the dependencies needed for the elixir and frontend."
+    deps: [elixir:install-deps]
+
+  elixir:install-deps:
+    desc: "Install the dependencies needed for elixir backend."
+    env:
+      MIX_ENV: dev
+    cmds:
+      - mix deps.get
+      - mix deps.compile
+
+  elixir:start:
+    desc: "Start the phx server in dev mode along which internally starts the react dev server."
+
+    dotenv:
+      - .env.local
+      - .env.dev
+    env:
+      MIX_ENV: dev
+
+    cmds:
+      - elixir --cookie dtto_cookie --name dtto@127.0.0.1 -S mix phx.server
+
+  elixir:attach:
+    desc: "Attach iex to the running instance of elixir."
+    interactive: true
+    cmds:
+      - iex --erl "-kernel shell_history enabled -kernel shell_history_path \"./.erlang_history\"" --name attach@127.0.0.1 --cookie dtto_cookie --remsh "dtto@127.0.0.1"
+
+
+  mix:
+    desc: "Run any mix command. Provide args after --. Eg: task mix -- <args>"
+    dotenv:
+      - .env.local
+      - .env.dev
+    env:
+      MIX_ENV: dev
+    cmds:
+      - mix {{.CLI_ARGS}}
