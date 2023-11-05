@@ -20,6 +20,17 @@ if System.get_env("PHX_SERVER") do
   config :dtto, DttoWeb.Endpoint, server: true
 end
 
+directus_access_token =
+  System.get_env("DIRECTUS_ACCESS_TOKEN") ||
+    raise """
+    environment variable DIRECTUS_ACCESS_TOKEN is missing.
+    """
+
+config :dtto, :directus,
+  access_token: directus_access_token,
+  base_url: System.get_env("DIRECTUS_BASE_URL") || "https://sonio-directus.local.eu-west-3.data.sonio.cloud:4430"
+# config :dtto, :directus, :base_url, System.get_env("DIRECTUS_BASE_URL") || "https://sonio-directus.local.eu-west-3.data.sonio.cloud:4430"
+
 if config_env() == :prod do
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
