@@ -14,10 +14,16 @@ defmodule DttoWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", DttoWeb do
+  scope "/app", DttoWeb do
     pipe_through :browser
 
     get "/", PageController, :home
+  end
+
+  scope "/", DttoWeb do
+    pipe_through :browser
+
+    get "/:key", PageController, :shortcut
   end
 
   # Other scopes may use custom stacks.
