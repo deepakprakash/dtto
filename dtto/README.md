@@ -1,9 +1,27 @@
 # Dtto
 
-To start your Phoenix server:
+## Setup
+Install asdf and task first
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+### Install tools & dependencies
+
+```
+task init
+```
+
+### Populate .env
+Create a .env.local file and put in the following env vars
+
+```
+DIRECTUS_ACCESS_TOKEN=
+DIRECTUS_BASE_URL=
+```
+
+### Run server
+
+```
+task elixir:start
+```
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
